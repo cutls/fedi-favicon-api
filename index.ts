@@ -11,10 +11,13 @@ const koa = new Koa()
 
 router.get('/get/:domain', async (ctx, next) => {
 	let file = null
-	const obj = ctx.query.type as null|undefined|'mastodon'|'pleroma'|'misskey'|'misskeylegacy'|'pixelfed'
+	let type = ctx.query.type as null | undefined | 'mastodon' | 'pleroma' | 'misskey' | 'misskeylegacy' | 'pixelfed'
 	const domain: string = ctx.params.domain
-	let type
 	if (!type) type = await detect(domain)
+	if (!type) {
+		ctx.body = { success: false }
+		return false
+	}
 	const result = await superagent.get(`https://${domain}`)
 	const $ = cheerio.load(result.text)
 	file = $('link[rel=icon]').attr('href')
@@ -51,7 +54,7 @@ async function getCompared(type: null | string) {
 	return resized
 }
 async function detect(domain: string) {
-	let type: string
+	let type: 'mastodon' | 'pleroma' | 'misskey' | 'misskeylegacy' | 'pixelfed' | null
 	try {
 		const donOrKey = await axios.get(`https://${domain}/favicon.ico`)
 		if (donOrKey.headers['content-type'] == 'text/html; charset=utf-8') throw 0
@@ -70,7 +73,7 @@ async function detect(domain: string) {
 				if (v11) type = 'misskeylegacy'
 			} catch (e) {
 				console.log(e)
-				type = ''
+				type = null
 			}
 		}
 	} catch {
@@ -85,7 +88,7 @@ async function detect(domain: string) {
 				type = 'pixelfed'
 			}
 		} catch {
-			type = ''
+			type = null
 		}
 	}
 	return type
