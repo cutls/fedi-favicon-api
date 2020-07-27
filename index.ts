@@ -27,7 +27,7 @@ router.get('/get/:domain', async (ctx, next) => {
 	const diff = Jimp.distance(gotimg, compared)
 	let isDefault = false
 	if(diff < 0.21) isDefault = true
-	ctx.body = { success: true, difference: diff, type: type, isDefault: isDefault }
+	ctx.body = { success: true, difference: diff, type: type, isDefault: isDefault, url: `${domain}/${file}` }
 })
 
 koa.use(router.routes())
