@@ -8,7 +8,12 @@ import url from 'url'
 
 const router = new Router()
 const koa = new Koa()
-
+router.get('/', async (ctx, next) => {
+	ctx.body = `<a href="https://github.com/cutls/fedi-favicon-api">fedi-favicon-api</a>`
+})
+router.get('/get', async (ctx, next) => {
+	ctx.body = { success: false, note: 'please look at GitHub to make a valid request' }
+})
 router.get('/get/:domain', async (ctx, next) => {
 	let file = null
 	let type = ctx.query.type as null | undefined | 'mastodon' | 'pleroma' | 'misskey' | 'misskeylegacy' | 'pixelfed'
