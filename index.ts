@@ -39,6 +39,13 @@ router.get('/get/:domain', async (ctx, next) => {
 	if (diff < 0.21) isDefault = true
 	ctx.body = { success: true, difference: diff, type: type, isDefault: isDefault, url: file }
 })
+router.get('/c/:file', async (ctx, next) => {
+	const file = new Buffer(ctx.params.file, 'base64').toString()
+	const gotimg = await Jimp.read(`https://images.weserv.nl/?url=${file}&output=png&w=15`)
+	const buffer = await gotimg.getBufferAsync(Jimp.MIME_PNG)
+	ctx.set('Content-Type', `image/png`)
+	ctx.body = buffer
+})
 
 koa.use(router.routes())
 koa.use(router.allowedMethods())
